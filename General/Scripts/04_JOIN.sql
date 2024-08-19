@@ -147,13 +147,46 @@ ORDER BY EMP_ID;
 -- EMPLOYEE 테이블, JOB테이블을 참조하여
 -- 사번, 이름, 직급코드, 직급명 조회
 
+SELECT * FROM JOB;
+
 -- ANSI
 -- 연결에 사용할 컬럼명이 같은 경우 USING(컬럼명)을 사용함
+
+/* USING 사용해서 JOIN하기 */
+SELECT 
+	EMP_ID, 
+	EMP_NAME, 
+	JOB_CODE, 
+	JOB_NAME
+FROM EMPLOYEE
+JOIN JOB USING(JOB_CODE);
+
+
+/* USING 사용 안하고 JOIN하기 */
+
+SELECT *
+FROM EMPLOYEE E -- 테이블명 별칭 (E, J)
+JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE);
+
+-- ORA-00918: 열의 정의가 애매합니다 
+--> JOB_CODE 컬럼명이 같아서 어떤 테이블의 컬럼이지 구분할 수 없기 때문
+
+--> 해결 방법 : JOB_CODE 앞에 테이블명 또는 별칭 작성
+
+
 
 
 
 -- 오라클 -> 별칭 사용
 -- 테이블 별로 별칭을 등록할 수 있음.
+SELECT 
+	EMP_ID, 
+	EMP_NAME, 
+	T1.JOB_CODE, -- 어떤 테이블의 컬럼을 조회할지 별칭을 작성!
+	JOB_NAME
+FROM EMPLOYEE T1, JOB T2
+WHERE T1.JOB_CODE = T2.JOB_CODE;
+
 
 
 
@@ -169,32 +202,57 @@ ORDER BY EMP_ID;
 SELECT EMP_NAME, DEPT_TITLE
 FROM EMPLOYEE
 /*INNER*/ JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
+-- 21행 조회(하동운, 이오리 제외)
 
 
 -- 1) LEFT [OUTER] JOIN  : 합치기에 사용한 두 테이블 중 왼편에 기술된 테이블의 
 -- 컬럼 수를 기준으로 JOIN
 -- ANSI 표준
+SELECT EMP_NAME, DEPT_TITLE
+FROM EMPLOYEE 
+LEFT JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
 
 
-
--- 오라클 구문
+-- 오라클 구문 (+)
+SELECT EMP_NAME, DEPT_TITLE
+FROM EMPLOYEE, DEPARTMENT
+WHERE DEPT_CODE = DEPT_ID(+);
+-- DEPT_CODE의 값이
+-- DEPT_ID와 일치하지 않아도 결과에 포함(추가)해라
 
 
 
 -- 2) RIGHT [OUTER] JOIN : 합치기에 사용한 두 테이블 중 
 -- 오른편에 기술된 테이블의  컬럼 수를 기준으로 JOIN
 -- ANSI 표준
+SELECT EMP_NAME, DEPT_TITLE
+FROM EMPLOYEE 
+RIGHT JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
+-- INNER JOIN 결과에 포함되지 않았던
+-- DEPARTMENT의 D3, D4, D7도 JOIN 결과에 포함
 
 
 -- 오라클 구문
+SELECT EMP_NAME, DEPT_TITLE
+FROM EMPLOYEE, DEPARTMENT
+WHERE DEPT_CODE(+) = DEPT_ID;
 
--- 3) FULL [OUTER] JOIN   : 합치기에 사용한 두 테이블이 가진 모든 행을 결과에 포함
+
+
+-- 3) FULL [OUTER] JOIN   : 
+-- 합치기에 사용한 두 테이블이 가진 모든 행을 결과에 포함
 -- ** 오라클 구문은 FULL OUTER JOIN을 사용 못함
 
 -- ANSI 표준
+SELECT EMP_NAME, DEPT_TITLE
+FROM EMPLOYEE 
+FULL JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
 
-
-
+-- INNER JOIN 결과에 포함되지 못했던
+-- EMPLOYEE 테이블의 하동운, 이오리
+-- DEPRTMENT 테이블의 D3, D4, D7
+-- 모두를 JOIN 결과에 포함 시켜라
+-- == LEFT UNION(합집합) RIGHT와 같은 결과
 
 
 
@@ -202,6 +260,16 @@ FROM EMPLOYEE
 
 -- 3. 교차 조인(CROSS JOIN == CARTESIAN PRODUCT)
 --  조인되는 테이블의 각 행들이 모두 매핑된 데이터가 검색되는 방법(곱집합)
+
+--> 직접 사용 보단 SELF JOIN의 실패 결과로 보여지는 모습이다!
+--  라고 알아두는게 좋음
+
+SELECT EMP_NAME, DEPT_CODE, DEPT_TITLE
+FROM EMPLOYEE
+CROSS JOIN DEPARTMENT
+ORDER BY EMP_NAME, DEPT_CODE;
+
+
 
 
 
@@ -213,19 +281,55 @@ FROM EMPLOYEE
 --  지정한 컬럼 값이 일치하는 경우가 아닌, 값의 범위에 포함되는 행들을 연결하는 방식
 
 
+-- 사원의 급여가
+-- SAL_LEVEL에 작성된 최소(MIN_SAL) ~ 최대(MAX_SAL) 
+-- 범위의 급여가 맞을 때만 결과에 포함하겠다는 JOIN
+
+--> 사원이 자신의 급여 레벨에 맞는 돈을 잘 받고 있는지 확인
+SELECT 
+	E.EMP_NAME, 
+	E.SAL_LEVEL,
+	E.SALARY,
+	S.MIN_SAL,
+	S.MAX_SAL
+FROM EMPLOYEE  E
+JOIN SAL_GRADE S 
+	ON (E.SALARY BETWEEN S.MIN_SAL AND S.MAX_SAL);
+
+
+
 ---------------------------------------------------------------------------------------------------------------
 
 -- 5. 자체 조인(SELF JOIN)
 
 -- 같은 테이블을 조인.
 -- 자기 자신과 조인을 맺음
+--> 똑같은 테이블이 2개가 있다고 생각하면 쉽다!!!
+
+-- EMPLOYEE 테이블에서
+-- 모든 사원의 이름과, 사수 번호(MANAGER_ID), 사수 이름 조회
 
 -- ANSI 표준
+SELECT 
+	EMP.EMP_NAME "사원명", 
+	NVL(EMP.MANAGER_ID , '없음') "사수 번호",
+	NVL(MGR.EMP_NAME   , '없음') "사수명"
+FROM 
+	EMPLOYEE EMP
+LEFT JOIN 
+	EMPLOYEE MGR
+	ON (EMP.MANAGER_ID = MGR.EMP_ID);
 
 
 
 -- 오라클 구문
-
+SELECT 
+	EMP.EMP_NAME "사원명", 
+	NVL(EMP.MANAGER_ID , '없음') "사수 번호",
+	NVL(MGR.EMP_NAME   , '없음') "사수명"
+FROM 
+	EMPLOYEE EMP, EMPLOYEE MGR
+WHERE EMP.MANAGER_ID = MGR.EMP_ID(+);
 
 
 ---------------------------------------------------------------------------------------------------------------
