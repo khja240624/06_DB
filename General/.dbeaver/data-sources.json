@@ -77,6 +77,27 @@
 					"include": ["WORKBOOK"]
 				}
 			]
+		},
+		"oracle_thin-19169b7cfae-6dd7dd6e73c79b7": {
+			"provider": "oracle",
+			"driver": "oracle_thin",
+			"name": "khj-1.xyz",
+			"save-password": true,
+			"configuration": {
+				"host": "khj-1.xyz",
+				"port": "10000",
+				"database": "XE",
+				"url": "jdbc:oracle:thin:@//khj-1.xyz:10000/XE",
+				"configurationType": "MANUAL",
+				"home": "C:\\app\\user1\\product\\18.0.0\\dbhomeXE",
+				"type": "dev",
+				"closeIdleConnection": true,
+				"provider-properties": {
+					"@dbeaver-connection-type@": "BASIC",
+					"@dbeaver-sid-service@": "SERVICE"
+				},
+				"auth-model": "oracle_native"
+			}
 		}
 	},
 	"connection-types": {
@@ -84,7 +105,7 @@
 			"name": "Development",
 			"color": "255,255,255",
 			"description": "Regular development database",
-			"auto-commit": false,
+			"auto-commit": true,
 			"confirm-execute": false,
 			"confirm-data-change": false,
 			"smart-commit": false,
