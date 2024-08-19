@@ -190,10 +190,15 @@ ORDER BY JOB_CODE ASC;
 
 
 
-
 -- 3.EMPLOYEE 테이블에서 
 -- 부서별 80년대생의 급여 평균이 400만 이상인 부서를 조회하여
 -- 부서 코드 오름차순으로 정렬하세요
+SELECT DEPT_CODE, FLOOR(AVG(SALARY)) "급여 평균"
+FROM EMPLOYEE
+WHERE SUBSTR(EMP_NO, 1, 1) = '8'
+GROUP BY DEPT_CODE
+HAVING AVG(SALARY) >= 4000000
+ORDER BY DEPT_CODE ASC;
                
                       
                       
@@ -262,9 +267,38 @@ WHERE DEPT_CODE IS NULL;
 -- UNION : 여러개의 쿼리 결과를 하나로 합치는 연산자
 -- 중복된 영역을 제외하여 하나로 합친다.
 
+-- 'D5', 'D6' 사원 조회
+
+-- 부서 코드가 'D5'인 사원의 이름, 부서코드 조회
+SELECT EMP_NAME, DEPT_CODE
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+
+UNION
+
+-- 부서 코드가 'D6'인 사원의 이름, 부서코드 조회
+SELECT EMP_NAME, DEPT_CODE
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D6';
+
 
 
 -- INTERSECT : 여러개의 SELECT한 결과에서 공통 부분만 결과로 추출 (교집합)
+
+
+-- 부서코드가 'D5'인 사원의 이름, 부서코드, 급여 조회
+--> 박나라, 하이유, 김해술, 심봉선, 윤은해, 대북혼
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+
+INTERSECT
+
+-- 급여가 400만 초과하는 사원의 이름, 부서코드, 급여 조회
+--> 선동일, 송종기, 노옹철, 유재식, 정중하, 심봉선, 대북혼, 전지연
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 4000000;
 
 
 
@@ -272,10 +306,37 @@ WHERE DEPT_CODE IS NULL;
 -- UNION ALL : 여러개의 쿼리 결과를 하나로 합치는 연산자
 -- UNION과의 차이점은 중복영역을 모두 포함시킨다. (합집합 +  교집합)
 
+--> 심봉선, 대북혼이 2행씩 조회됨
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+
+UNION ALL
+
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 4000000;
+
 
 
 -- MINUS : 선행 SELECT 결과에서 다음 SELECT 결과와 겹치는 부분을 제외한 나머지 부분만 추출(차집합)
 -- 부서 코드 D5 중 급여가 400만 초과인 직원 제외
+
+--> 교집합인 심봉선, 대북혼을 제외한 
+--  앞쪽 SELECT의 RESULT SET이 조회됨
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+
+MINUS
+
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 4000000;
+
+
+
+
 
 
 

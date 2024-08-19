@@ -47,9 +47,9 @@ FROM DEPARTMENT;
 
 
 SELECT EMP_ID, EMP_NAME, DEPT_CODE, DEPT_TITLE
-FROM EMPLOYEE
+FROM EMPLOYEE 
 JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
-
+	--> DEPT_CODE와 DEPT_ID 값이 같은 행을 한 행으로 합쳐라
 
 /*  JOIN은 단순히 테이블을 두개를 붙이는 것이 아닌
  *  
@@ -89,30 +89,57 @@ JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
 -- 서로 같은 부서 코드를 나타낸다.
 --> 이를 통해 두 테이블이 관계가 있음을 알고 조인을 통해 데이터 추출이 가능.
 
+
 -- ANSI
 -- 연결에 사용할 컬럼명이 다른 경우 ON()을 사용
 SELECT EMP_ID, EMP_NAME, DEPT_CODE, DEPT_ID, DEPT_TITLE
 FROM EMPLOYEE
-JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID);
+JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID); -- 21행
+-- 하동운, 이오리 제외
+
+--> DEPT_CODE, DEPT_ID가 일치하는 행 끼리 한 행으로 합쳐짐
+ --> 단, 일치하는 값이 없을 경우 JOIN 결과에서 제외된다!!
+  --> == INNER JOIN
 
 
 -- 오라클 (JOIN이라는 단어를 작성하지 않음)
 SELECT EMP_ID, EMP_NAME, DEPT_CODE, DEPT_ID, DEPT_TITLE
-FROM EMPLOYEE, DEPARTMENT
+FROM EMPLOYEE, DEPARTMENT 
 WHERE DEPT_CODE = DEPT_ID;
-
-
-
 
 
 
 
 -- DEPARTMENT 테이블, LOCATION 테이블을 참조하여
 -- 부서명, 지역명 조회
+SELECT * FROM DEPARTMENT;
+SELECT * FROM LOCATION;
+
 
 -- ANSI 방식
+SELECT DEPT_TITLE 부서명, LOCAL_NAME 지역명
+FROM DEPARTMENT
+/*INNER*/ JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE);
+
+--> INNER JOIN이 JOIN의 기본 값(생략 가능)
+
 
 -- 오라클 방식
+SELECT DEPT_TITLE 부서명, LOCAL_NAME 지역명
+FROM DEPARTMENT, LOCATION
+WHERE LOCATION_ID = LOCAL_CODE;
+
+
+-- 부서명이 '해외영업2부'인 사원의
+-- 사번(EMP_ID), 이름(EMP_NAME), 부서명(DEPT_TITLE)을 
+-- 사번 오름차순으로 조회
+--SELECT * FROM DEPARTMENT;
+
+SELECT EMP_ID, EMP_NAME, DEPT_TITLE
+FROM EMPLOYEE
+JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID)
+WHERE DEPT_TITLE = '해외영업2부'
+ORDER BY EMP_ID;
 
 
 
