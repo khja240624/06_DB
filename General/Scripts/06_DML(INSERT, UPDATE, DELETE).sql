@@ -380,7 +380,12 @@ WHERE EMP_NAME = '장채현'; -- 조회 결과 없음
 COMMIT; -- DML 수행 결과를 데이터베이스에 반영
 
 -- EMPLOYEE2 테이블 전체 삭제
+DELETE FROM EMPLOYEE2;
 
+SELECT * FROM EMPLOYEE2; -- 조회 결과 없음
+
+ROLLBACK;
+SELECT * FROM EMPLOYEE2; 
 
 ---------------------------------------------------------------------------------------------
 
